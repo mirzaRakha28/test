@@ -41,3 +41,4 @@ jobs:
           docker stop test-container || true
           docker rm test-container || true
           docker run -d -p 6060:6060 --name test-container mirzarakha2804/test:${{ github.sha }}
+
