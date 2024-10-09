@@ -35,8 +35,7 @@ jobs:
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_SSH_PORT }}
+        # key: ${{ secrets.VPS_SSH_KEY }}
         script: |
           docker pull mirzarakha2804/test:${{ github.sha }}
           docker stop test-container || true
