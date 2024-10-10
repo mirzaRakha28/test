@@ -25,10 +25,10 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Docker image
-      run: docker build . -t mirzarakha2804/test:${{ github.sha }}
+      run: docker build . -t mirzarakha2804/talk_bot:${{ github.sha }}
 
     - name: Push Docker image to Docker Hub
-      run: docker push mirzarakha2804/test:${{ github.sha }}
+      run: docker push mirzarakha2804/talk_bot:${{ github.sha }}
 
     - name: Deploy to VPS via SSH
       uses: appleboy/ssh-action@v0.1.5
@@ -37,10 +37,19 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          docker pull mirzarakha2804/test:${{ github.sha }}
+          # Check if .env file exists; if not, copy from the repository
+          if [ ! -f /home/arvalinno/seatalk_bot/.env ]; then
+            echo "File .env not found, copying from repository..."
+            mkdir -p /home/arvalinno/seatalk_bot
+            cp /home/arvalinno/seatalk_bot/.env /home/arvalinno/seatalk_bot/.env  # Ganti dengan path relatif yang sesuai
+          fi
+
+          # Pull the latest image from Docker Hub
+          docker pull mirzarakha2804/talk_bot:${{ github.sha }}
+          
+          # Stop and remove old container if exists
           docker stop test-container || true
           docker rm test-container || true
-          docker run -d -p 6060:6060 --name test-container mirzarakha2804/test:${{ github.sha }}
 
-
-
+          # Run new container
+          docker run -d -p 6969:6969 --name test-container --env-file /home/arvalinno/seatalk_bot/.env mirzarakha2804/talk_bot:${{ github.sha }}
